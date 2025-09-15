@@ -1,7 +1,7 @@
 
 // ============================================================================
 // Tetris Stack - Gerenciamento de Peças com Fila Circular e Pilha Linear
-// Autor: [Seu Nome]
+// Autor: Jonathan de Souza Araújo
 // Descrição: Simula o gerenciamento de peças futuras e reservadas no jogo Tetris Stack.
 // Utiliza fila circular para peças futuras e pilha linear para peças reservadas.
 // ============================================================================
