@@ -169,6 +169,33 @@ void mostrarPilha(PilhaPecas* pilha) {
 }
 
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// Função para trocar a peça da frente da fila com o topo da pilha
+// -----------------------------------------------------------------------------
+int trocarFrenteFilaComTopoPilha(FilaPecas* fila, PilhaPecas* pilha) {
+    if (filaVazia(fila) || pilhaVazia(pilha)) return 0;
+    // Troca os dados das peças
+    Peca temp = fila->elementos[fila->inicio];
+    fila->elementos[fila->inicio] = pilha->elementos[pilha->topo];
+    pilha->elementos[pilha->topo] = temp;
+    return 1;
+}
+
+// -----------------------------------------------------------------------------
+// Função para troca múltipla entre as 3 primeiras peças da fila e as 3 da pilha
+// -----------------------------------------------------------------------------
+int trocaMultipla(FilaPecas* fila, PilhaPecas* pilha) {
+    if (fila->qtd < 3 || pilha->topo < 2) return 0; // Precisa de pelo menos 3 peças em cada
+    for (int i = 0; i < 3; i++) {
+        int idxFila = (fila->inicio + i) % TAM_FILA;
+        Peca temp = fila->elementos[idxFila];
+        fila->elementos[idxFila] = pilha->elementos[pilha->topo - i];
+        pilha->elementos[pilha->topo - i] = temp;
+    }
+    return 1;
+}
+
+// -----------------------------------------------------------------------------
 // Função principal: menu interativo para manipular fila e pilha de peças
 // -----------------------------------------------------------------------------
 int main() {
@@ -185,15 +212,21 @@ int main() {
 
     int opcao;
     do {
-        printf("\nEstado atual:\n");
+        printf("\n==============================================\n");
+        printf("Estado atual das estruturas:\n");
         mostrarFila(&fila);
         mostrarPilha(&pilha);
-        printf("\nOpções de ação:\n");
-        printf("1 - Jogar peça\n");
-        printf("2 - Reservar peça\n");
-        printf("3 - Usar peça reservada\n");
-        printf("0 - Sair\n");
-        printf("Opção: ");
+        printf("==============================================\n");
+        printf("\nOpções disponíveis:\n");
+        printf("Código\tAção\n");
+        printf("1\tJogar peça da frente da fila\n");
+        printf("2\tEnviar peça da fila para a pilha de reserva\n");
+        printf("3\tUsar peça da pilha de reserva\n");
+        printf("4\tTrocar peça da frente da fila com o topo da pilha\n");
+        printf("5\tTrocar os 3 primeiros da fila com as 3 peças da pilha\n");
+        printf("0\tSair\n");
+        printf("==============================================\n");
+        printf("Opção escolhida: ");
         scanf("%d", &opcao);
         getchar(); // Limpa o \n do buffer
 
@@ -201,7 +234,7 @@ int main() {
             // Jogar peça: remove da frente da fila
             Peca removida;
             if (dequeue(&fila, &removida)) {
-                printf("Peça jogada: [%c %d]\n", removida.tipo, removida.id);
+                printf("Ação: Peça jogada: [%c %d]\n", removida.tipo, removida.id);
                 // Após jogar, insere nova peça automaticamente
                 enqueue(&fila, gerarPeca(&fila));
             } else {
@@ -217,16 +250,30 @@ int main() {
                 Peca reservada;
                 dequeue(&fila, &reservada);
                 push(&pilha, reservada);
-                printf("Peça [%c %d] reservada no topo da pilha.\n", reservada.tipo, reservada.id);
+                printf("Ação: Peça [%c %d] reservada no topo da pilha.\n", reservada.tipo, reservada.id);
                 enqueue(&fila, gerarPeca(&fila));
             }
         } else if (opcao == 3) {
             // Usar peça reservada: remove do topo da pilha
             Peca usada;
             if (pop(&pilha, &usada)) {
-                printf("Peça reservada usada: [%c %d]\n", usada.tipo, usada.id);
+                printf("Ação: Peça reservada usada: [%c %d]\n", usada.tipo, usada.id);
             } else {
                 printf("Pilha de reserva vazia! Não há peça para usar.\n");
+            }
+        } else if (opcao == 4) {
+            // Trocar peça da frente da fila com o topo da pilha
+            if (trocarFrenteFilaComTopoPilha(&fila, &pilha)) {
+                printf("Ação: Troca realizada entre a peça da frente da fila e o topo da pilha.\n");
+            } else {
+                printf("Não foi possível realizar a troca (verifique se há peças suficientes).\n");
+            }
+        } else if (opcao == 5) {
+            // Troca múltipla entre as 3 primeiras da fila e as 3 da pilha
+            if (trocaMultipla(&fila, &pilha)) {
+                printf("Ação: Troca realizada entre os 3 primeiros da fila e as 3 peças da pilha.\n");
+            } else {
+                printf("Não foi possível realizar a troca múltipla (verifique se há peças suficientes).\n");
             }
         } else if (opcao == 0) {
             printf("Saindo do sistema de controle de peças.\n");
